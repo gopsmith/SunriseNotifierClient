@@ -100,10 +100,12 @@ export default class App extends React.Component {
     // listen for possible PushNotification Registration error
     PushNotificationIOS.addEventListener('registrationError', (obj) => {
       //obj: {message: string, code: number, details: any}
-      console.log(`*** ERROR IN REGISTERING for Push Notifications: ${obj.message}`);
-      this.setState({message: 'the Sunrise/Sunset server will never be updated'});
-      alert(`ERROR registering for Push Notifications and getting device token:\n\n"${obj.message}".` + 
-        '\n\nWithout this, the Sunrise/Sunset server will never be updated.');
+      console.log('*** ERROR REGISTERING for Push Notifs & getting device token' +
+                  ` (Sunrise/Sunset server will never be updated): ${obj.message}`);
+      this.setState({message: '(Demo Mode: no push notifications)'});
+      alert('Unable to register your device for Push Notifications.' + 
+        '\n\nIf you want to try again, close and restart the app when the network is available.');
+        // what about if they simply decined the Push registration??
     });
   }
 
@@ -114,6 +116,7 @@ export default class App extends React.Component {
 
   componentDidMount() {
     console.log (`***DeviceInfo.getDeviceId: ${DeviceInfo.getDeviceId()}`);
+    console.log (`***DeviceInfo.getUniqueID: ${this.uniqueID}`);
 
     PushNotificationIOS.requestPermissions();
     navigator.geolocation.setRNConfiguration({skipPermissionRequests: false});
@@ -215,6 +218,7 @@ export default class App extends React.Component {
                     latitude: latitude,
                     longitude: longitude,
                     locationName: this.getLocationName(latitude, longitude),
+                    message: '',
                     //showLocationButton: true,
                   });
                 }
@@ -232,13 +236,23 @@ export default class App extends React.Component {
               },
               (error) => {
                 this.setState ({
-                  firstSunEvent: '',
-                  secondSunEvent: '',
                   latitude: 'unavailable',
                   longitude: 'unavailable',
                   locationName: '',
-                  message: 'unable to determine your location, which is a requirement for getting the Sunrise/Sunset times'
                 });
+                if (this.state.firstSunEvent == '') {
+                  this.setState ({
+                    message: 'Unable to determine your location -' +
+                             ' Sunrise/Sunset times cannot be determined without it.' + 
+                             ' To enable location services, go to Settings > Privacy > Location Services and' +
+                             ' find "SunriseNotifier"',
+                  });
+                } else {
+                  this.setState ({
+                    message: '(Unable to determine your location - displaying' +
+                             ' previously-retrieved Sunrise/Sunset times)',
+                            });
+                }
                 console.log(`*** GeoLocation.getLocation REJECTED, error = ${error.message}`);
               },
               {
@@ -271,7 +285,7 @@ export default class App extends React.Component {
               responseObj = JSON.parse(responseText);
               if (responseObj.status == 'OK') {
                 console.log (`*** getLocationName returned: ${responseObj.results[0].formatted_address}`);
-                this.setState({locationName: responseObj.results[0].formatted_address});
+                this.setState({locationName: responseObj.results[0].formatted_address, message: ''});
               }
               else {
                 console.log(`*** getLocationName returned: ${responseObj.status}`)
@@ -289,7 +303,7 @@ export default class App extends React.Component {
   reportGetLocationNameError = (error) => {
     this.setState({
       isLoading: false,
-      message: `error in getting Location Name: "${error.message}"`,
+      message: `(unable to get the Location Name)`,
     })
     console.log('*** getLocationName error: ', error); // string interp. N/G for error OBJECT
   };
@@ -297,7 +311,7 @@ export default class App extends React.Component {
   getSunTimesAndUpdateServer = (day, savedSunTimes) => {
     const query = Servers.urlForSunTimesQuery(this.state.latitude, this.state.longitude, day);
     if (savedSunTimes) console.log(`***getSunTimesAndUpdateServer: savedSunTimes.sunrise = ${savedSunTimes.sunrise}`);
-    this.setState({ isLoading: true });
+    this.setState({ isLoading: true, message: '' });
     //this.reportSunTimesFetchError({message: '**TEST ERROR from getSunTimesAndUpdateServer**'}); return; //TESTING
 
     // 1) get the next Sunrise/Sunset times:
@@ -318,11 +332,10 @@ export default class App extends React.Component {
   reportSunTimesFetchError = (error) => {
     this.setState({
       isLoading: false,
-      firstSunEvent: 'unable to retrieve the next times',
-      secondSunEvent: 'from the Sunrise/Sunset server',
-      message: `error: "${error.message}"`,
+      message: 'Unable to get the next Sunrise/Sunset times. Showing previously-retrieved times.' +
+               ' (I\'ll try again when you have a working internet connection.)',
     });
-    console.log('*** SunTimes query error: ', error); // string interp. N/G for error OBJECT
+    console.log(`*** SunTimes query error: ${error.message}`);
   };
 
   dataAndServerUpdate = (responseText, day, savedSunTimes) => {
@@ -338,6 +351,7 @@ export default class App extends React.Component {
         this.setState({
           firstSunEvent: `Sunrise: ${sunTimes.sunriseStr}`,
           secondSunEvent: `Sunset: ${sunTimes.sunsetStr}`,
+          message: '',
         });
         this.sunrise = sunTimes.sunrise;
         this.sunset = sunTimes.sunset;
@@ -367,6 +381,7 @@ export default class App extends React.Component {
       this.setState({
         firstSunEvent: savedTimeSlot == 2 ? `Sunrise: ${sunTimes.sunriseStr}` : `Sunset: ${savedSunTimes.sunsetStr}`,
         secondSunEvent: savedTimeSlot == 2 ? `Sunset: ${sunTimes.sunsetStr}` : `Sunrise: ${sunTimes.sunriseStr}`,
+        message: '',
       });
       this.sunrise = sunTimes.sunrise;
       this.sunset = savedTimeSlot == 2 ? sunTimes.sunset : savedSunTimes.sunset;
@@ -382,7 +397,7 @@ export default class App extends React.Component {
 
     if (areDataReady) {
       const [url, data] = Servers.urlAndDataForSunriseServer(this.state.latitude, this.state.longitude, this.uniqueID, this.deviceToken, SUNRISE_API_PW);
-      this.setState({ isLoading: true });
+      this.setState({ isLoading: true, message: '' });
       this.serverWasUpdated = false;
       //this.reportSendToServerError({message: '**TEST ERROR from sendToServer**'}, data); return; //TESTING
 
@@ -409,9 +424,8 @@ export default class App extends React.Component {
   reportSendToServerError = (error, data) => {
     this.setState({
       isLoading: false,
-      message: 'Your location changed but we couldn\'t update our Sunrise server.' +
-        ' Until the network is available, notifications will' +
-        ` be based on your last location.\n\n[${error.message}]`,
+      message: 'Your location changed, but we couldn\'t update our Sunrise server.' +
+               ' Until the network is available, notifications will be based on your last location.',
     });
     this.serverWasUpdated = false;
     console.log('*** SunriseServer update error: ', error, '; data = ', data); // string interp. N/G for error OBJECT
