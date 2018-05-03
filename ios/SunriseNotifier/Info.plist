@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>SunriseNotifier</string>
+	<string>Sunrise/Sunset Notifier</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -21,7 +21,7 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>20</string>
+	<string>21</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -36,7 +36,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Sunrise Notifier needs your location in order to calculate the next sunrise/sunset times.</string>
+	<string>Sunrise/Sunset Notifier needs your location in order to calculate the next sunrise/sunset times.</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
