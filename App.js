@@ -4,6 +4,7 @@ import {
   Text,
   View,
   Button,
+  Linking,
   Dimensions,
   ImageBackground,
   ActivityIndicator,
@@ -450,16 +451,19 @@ export default class App extends React.Component {
     );
   };
   
-  showDeviceDetails = () => {
-    let serverMsg = this.serverWasUpdated ? 'WAS UPDATED' : 'was NOT UPDATED';
-    alert(`DATA: checked for updates.\n\nSERVER: ${serverMsg}.\n\nID-TOKEN: ${this.deviceToken}\n\nUUID: ${this.uniqueID}`);
-    this.setState({ showDetailsButton: false });
-    this.serverWasUpdated = false;
-  };
-
   showLocationChange = () => {
     alert(`YOUR GEOLOCATION CHANGED!\n\nWAS:\n${this.prevLatitude}, ${this.prevLongitude}\n\nNOW:\n${this.state.latitude}, ${this.state.longitude},`);
     this.setState({ showLocationButton: false });
+  }
+
+  showCredits = () => {
+    alert("SUNRISE/SUNSET NOTIFIER\n\nDeveloper: Amigo Software Labs" +
+          "\nSun Data: sunrise-sunset.org\nLocation Name: Google Geocoding API" + 
+          `\n\nID-TOKEN: ${this.deviceToken}\n\nUUID: ${this.uniqueID}`);
+  }
+
+  openTermsPrivacyPage = () => {
+    Linking.openURL("https://amigosoftwarelabs.com");
   }
 
   render() {
@@ -532,6 +536,16 @@ export default class App extends React.Component {
               title="Geolocation changed. Tap for info!"
             />
           }
+          <Button
+            onPress={this.showCredits}
+            color ='#FFFFFF'
+            title="About/Credits..."
+          />
+          <Button
+            onPress={this.openTermsPrivacyPage}
+            color ='#000000'
+            title='Terms of Use & Privacy Policy...'
+          />
         </ImageBackground>
       </View>
     );
@@ -553,33 +567,33 @@ const styles = StyleSheet.create({
   },
   timeText: {
     color: '#000000',
-    fontSize: 50,
+    fontSize: 48,
   },
   dateText: {
     color: '#000000',
-    fontSize: 40,
+    fontSize: 36,
   },
   sunTimesText: {
     color: '#FFFFFF',
     //fontWeight: 'bold',
-    fontSize: 21,
+    fontSize: 20,
   },
   geoLocationText: {
     color: '#000000',
-    fontSize: 20,
+    fontSize: 18,
   },
   geoLocationName: {
     marginLeft: 10,
     marginRight: 10,
     textAlign: 'center',
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 16,
   },
   message: {
     marginLeft: 10,
     marginRight: 10,
     textAlign: 'center',
     color: '#000000',
-    fontSize: 18,
-  }
+    fontSize: 16,
+  },
 });
