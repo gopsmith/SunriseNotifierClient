@@ -463,7 +463,7 @@ export default class App extends React.Component {
   }
 
   openTermsPrivacyPage = () => {
-    Linking.openURL("https://amigosoftwarelabs.com");
+    Linking.openURL("http://amigosoftwarelabs.com");
   }
 
   render() {
