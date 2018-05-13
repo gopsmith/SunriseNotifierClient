@@ -65,7 +65,7 @@ export default class App extends React.Component {
   }
 
   //class instance variables
-  uniqueID = DeviceInfo.getUniqueID(); // this is called uuid, in Sunrise Server
+  uniqueID = DeviceInfo.getUniqueID(); // this is called uuid, in Sunrise Server. On iOS it's the IDFV (ID for Vendor).
   deviceToken = '';  //this is called device_id, in Sunrise Server
   prevLatitude = '';
   prevLongitude = '';
@@ -117,7 +117,7 @@ export default class App extends React.Component {
   }
 
   componentDidMount() {
-    console.log (`***DeviceInfo.getDeviceId: ${DeviceInfo.getDeviceId()}`);
+    console.log (`***DeviceInfo.getDeviceId: ${DeviceInfo.getDeviceId()}`); //iOS format: "iPhone7,2"
     console.log (`***DeviceInfo.getUniqueID: ${this.uniqueID}`);
 
     PushNotificationIOS.requestPermissions();
