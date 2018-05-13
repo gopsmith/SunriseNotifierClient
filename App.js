@@ -27,6 +27,7 @@ const GET_TIME_TIMER = 1000;
 const UPDATE_DATA_AND_SERVER_TIMER = 60000;  //normally 60000; set it to 5000 for geolocation-change testing
 const GEOLOCATION_TIMEOUT = 10000;  // 10 sec. is recommended
 const FETCH_TIMEOUT = 4000;   // don't set this to less than 4 sec.
+const TERMS_PRIVACY_LINK = "http://amigosoftwarelabs.com/downloads/PrivacyPolicy.pdf"
 
 function getTime() {
   //better solution might be to use the library http://momentjs.com/
@@ -463,7 +464,7 @@ export default class App extends React.Component {
   }
 
   openTermsPrivacyPage = () => {
-    Linking.openURL("http://amigosoftwarelabs.com");
+    Linking.openURL(TERMS_PRIVACY_LINK);
   }
 
   render() {
